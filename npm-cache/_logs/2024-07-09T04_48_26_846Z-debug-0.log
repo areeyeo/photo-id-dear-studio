@@ -1,0 +1,46 @@
+0 verbose cli D:\Program Files\nodejs\node.exe D:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.7.0
+2 info using node@v20.15.1
+3 silly config:load:file:D:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config:load:file:D:\react_test\my-react-app\.npmrc
+5 silly config:load:file:C:\Users\areey\.npmrc
+6 silly config:load:file:C:\Users\areey\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm star
+8 verbose argv "star"
+9 verbose logfile logs-max:10 dir:D:\react_test\npm-cache\_logs\2024-07-09T04_48_26_846Z-
+10 verbose logfile D:\react_test\npm-cache\_logs\2024-07-09T04_48_26_846Z-debug-0.log
+11 verbose stack Error: 
+11 verbose stack Mark your favorite packages
+11 verbose stack
+11 verbose stack Usage:
+11 verbose stack npm star [<package-spec>...]
+11 verbose stack
+11 verbose stack Options:
+11 verbose stack [--registry <registry>] [--no-unicode] [--otp <otp>]
+11 verbose stack
+11 verbose stack Run "npm help star" for more info
+11 verbose stack     at Star.usageError (D:\Program Files\nodejs\node_modules\npm\lib\base-cmd.js:109:26)
+11 verbose stack     at Star.exec (D:\Program Files\nodejs\node_modules\npm\lib\commands\star.js:21:18)
+11 verbose stack     at Star.cmdExec (D:\Program Files\nodejs\node_modules\npm\lib\base-cmd.js:138:17)
+11 verbose stack     at D:\Program Files\nodejs\node_modules\npm\lib\npm.js:92:55
+11 verbose stack     at Object.start (D:\Program Files\nodejs\node_modules\npm\node_modules\proc-log\lib\index.js:101:21)
+11 verbose stack     at Npm.exec (D:\Program Files\nodejs\node_modules\npm\lib\npm.js:92:17)
+11 verbose stack     at module.exports (D:\Program Files\nodejs\node_modules\npm\lib\cli\entry.js:65:29)
+12 verbose cwd D:\react_test\my-react-app
+13 verbose Windows_NT 10.0.22631
+14 verbose node v20.15.1
+15 verbose npm  v10.7.0
+16 error code EUSAGE
+17 error
+17 error Mark your favorite packages
+17 error
+17 error Usage:
+17 error npm star [<package-spec>...]
+17 error
+17 error Options:
+17 error [--registry <registry>] [--no-unicode] [--otp <otp>]
+17 error
+17 error Run "npm help star" for more info
+18 verbose exit 1
+19 verbose code 1
+20 error A complete log of this run can be found in: D:\react_test\npm-cache\_logs\2024-07-09T04_48_26_846Z-debug-0.log
