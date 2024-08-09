@@ -1,0 +1,72 @@
+/* src/components/Header.css */
+
+.header {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #FFD1DC, #CBC3E3, #B4A0E5);
+    animation: headerBackgroundAnimation 10s infinite;
+  }
+  
+  @keyframes headerBackgroundAnimation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .header-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    animation: logoBounce 2s infinite;
+  }
+  
+  @keyframes logoBounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-20px);
+    }
+    60% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .title {
+    animation: textGlow 1.5s ease-in-out infinite alternate;
+  }
+  
+  @keyframes textGlow {
+    0% {
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+    100% {
+      text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    }
+  }
+  
+  .subtitle {
+    animation: subtitleFadeIn 3s ease-in-out infinite alternate;
+  }
+  
+  @keyframes subtitleFadeIn {
+    0% {
+      opacity: 0.5;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  

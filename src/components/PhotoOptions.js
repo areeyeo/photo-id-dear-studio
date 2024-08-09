@@ -1,72 +1,84 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
-const PhotoOptions = ({ photo }) => {
-  const [selectedOption, setSelectedOption] = useState("1in12");
+const PhotoOptions = ({ photo, brightness, blur }) => {
+  const [selectedOption, setSelectedOption] = useState("");
   const [photoGrid, setPhotoGrid] = useState(null);
   const [canvasData, setCanvasData] = useState(null);
+  const printRef = useRef();
 
-  const generatePhotoGrid = useCallback((option) => {
-    console.log(`Generating photo grid for option: ${option}`);
-    const gridSize = getGridSize(option);
-    if (!gridSize) return;
+  const generatePhotoGrid = useCallback(
+    (option) => {
+      console.log(`Generating photo grid for option: ${option}`);
+      const gridSize = getGridSize(option);
+      if (!gridSize) return;
 
-    const canvas = document.createElement("canvas");
-    canvas.width = gridSize.width;
-    canvas.height = gridSize.height;
-    const ctx = canvas.getContext("2d");
+      const canvas = document.createElement("canvas");
+      canvas.width = gridSize.width;
+      canvas.height = gridSize.height;
+      const ctx = canvas.getContext("2d");
 
-    // Set the background color to white
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Set the background color to white
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const img = new Image();
-    img.src = photo;
+      const img = new Image();
+      img.src = photo;
 
-    img.onload = () => {
-      const paddingX = gridSize.paddingX;
-      const paddingY = gridSize.paddingY;
+      img.onload = () => {
+        const paddingX = gridSize.paddingX;
+        const paddingY = gridSize.paddingY;
 
-      const totalWidth =
-        gridSize.cols * gridSize.cellWidth + (gridSize.cols - 1) * paddingX;
-      const totalHeight =
-        gridSize.rows * gridSize.cellHeight + (gridSize.rows - 1) * paddingY;
-      const offsetX = (gridSize.width - totalWidth) / 2;
-      const offsetY = option === "1in6" ? 30 : option === "1_5in6" ? 30 : (gridSize.height - totalHeight) / 2;
+        const totalWidth =
+          gridSize.cols * gridSize.cellWidth + (gridSize.cols - 1) * paddingX;
+        const totalHeight =
+          gridSize.rows * gridSize.cellHeight + (gridSize.rows - 1) * paddingY;
+        const offsetX = (gridSize.width - totalWidth) / 2;
+        const offsetY =
+          option === "1in6"
+            ? 30
+            : option === "1_5in6"
+            ? 30
+            : (gridSize.height - totalHeight) / 2;
 
-      for (let row = 0; row < gridSize.rows; row++) {
-        for (let col = 0; col < gridSize.cols; col++) {
-          const x = offsetX + col * (gridSize.cellWidth + paddingX);
-          const y = offsetY + row * (gridSize.cellHeight + paddingY);
+        for (let row = 0; row < gridSize.rows; row++) {
+          for (let col = 0; col < gridSize.cols; col++) {
+            const x = offsetX + col * (gridSize.cellWidth + paddingX);
+            const y = offsetY + row * (gridSize.cellHeight + paddingY);
 
-          const aspectRatio = img.width / img.height;
-          const cellAspectRatio = gridSize.cellWidth / gridSize.cellHeight;
-          let drawWidth, drawHeight, drawOffsetX, drawOffsetY;
+            const aspectRatio = img.width / img.height;
+            const cellAspectRatio = gridSize.cellWidth / gridSize.cellHeight;
+            let drawWidth, drawHeight, drawOffsetX, drawOffsetY;
 
-          if (aspectRatio > cellAspectRatio) {
-            drawWidth = gridSize.cellWidth;
-            drawHeight = drawWidth / aspectRatio;
-            drawOffsetX = 0;
-            drawOffsetY = (gridSize.cellHeight - drawHeight) / 2;
-          } else {
-            drawHeight = gridSize.cellHeight;
-            drawWidth = drawHeight * aspectRatio;
-            drawOffsetX = (gridSize.cellWidth - drawWidth) / 2;
-            drawOffsetY = 0;
+            if (aspectRatio > cellAspectRatio) {
+              drawWidth = gridSize.cellWidth;
+              drawHeight = drawWidth / aspectRatio;
+              drawOffsetX = 0;
+              drawOffsetY = (gridSize.cellHeight - drawHeight) / 2;
+            } else {
+              drawHeight = gridSize.cellHeight;
+              drawWidth = drawHeight * aspectRatio;
+              drawOffsetX = (gridSize.cellWidth - drawWidth) / 2;
+              drawOffsetY = 0;
+            }
+
+            ctx.filter = `brightness(${brightness}%) blur(${blur}px)`;
+
+            ctx.drawImage(
+              img,
+              x + drawOffsetX,
+              y + drawOffsetY,
+              drawWidth,
+              drawHeight
+            );
           }
-
-          ctx.drawImage(
-            img,
-            x + drawOffsetX,
-            y + drawOffsetY,
-            drawWidth,
-            drawHeight
-          );
         }
-      }
-      setPhotoGrid(canvas.toDataURL());
-      setCanvasData(canvas);
-    };
-  }, [photo]);
+        setPhotoGrid(canvas.toDataURL());
+        setCanvasData(canvas);
+      };
+    },
+    [photo, brightness, blur]
+  );
 
   useEffect(() => {
     if (photo && selectedOption) {
@@ -78,8 +90,8 @@ const PhotoOptions = ({ photo }) => {
     const dpi = 300;
     const inchToCm = 2.54;
     const cmToPx = (cm) => (cm / inchToCm) * dpi;
-    const paperWidth = 10.16; // 4 inches
-    const paperHeight = 15.24; // 6 inches
+    const paperWidth = 10.16;
+    const paperHeight = 15.24;
 
     switch (option) {
       case "1in12":
@@ -133,30 +145,40 @@ const PhotoOptions = ({ photo }) => {
 
   const downloadImage = () => {
     if (canvasData) {
-      canvasData.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "photo_grid.jpg";
-        a.click();
-        URL.revokeObjectURL(url);
-      }, "image/jpeg", 1.0);
+      canvasData.toBlob(
+        (blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "photo_grid.jpg";
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+        "image/jpeg",
+        1.0
+      );
     }
   };
 
-  const printImage = () => {
-    if (canvasData) {
-      const imgData = canvasData.toDataURL("image/jpeg");
-      const windowContent = `<html><body><img src="${imgData}" style="width:100%; height:100%"></body></html>`;
-      const printWin = window.open("", "", "width=800,height=600");
-      printWin.document.open();
-      printWin.document.write(windowContent);
-      printWin.document.close();
-      printWin.focus();
-      printWin.print();
-      printWin.close();
-    }
-  };
+  const printImage = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: "photo_grid",
+    pageStyle: `
+      @page {
+        size: 4in 6in;
+        margin: 0;
+      }
+      @media print {
+        body {
+          margin: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+        }
+      }
+    `,
+  });
 
   const resetOptions = () => {
     setSelectedOption("");
@@ -168,47 +190,47 @@ const PhotoOptions = ({ photo }) => {
     <div className="p-8 bg-white bg-opacity-75 rounded-lg shadow-lg">
       <div className="flex justify-center mb-4">
         <button
-          className="px-4 py-2 m-2 border rounded"
+          className="px-4 py-2 m-2 border rounded button"
           onClick={resetOptions}
           style={{ zIndex: 10 }}
         >
           Reset
         </button>
         <button
-          className={`px-4 py-2 m-2 border rounded ${
+          className={`px-4 py-2 m-2 border rounded button ${
             selectedOption === "1in12" ? "bg-selected" : ""
           }`}
           onClick={() => setSelectedOption("1in12")}
           style={{ zIndex: 10 }}
         >
-          1 in / 12 รูป
+          1 in / 12
         </button>
         <button
-          className={`px-4 py-2 m-2 border rounded ${
+          className={`px-4 py-2 m-2 border rounded button ${
             selectedOption === "1in6" ? "bg-selected" : ""
           }`}
           onClick={() => setSelectedOption("1in6")}
           style={{ zIndex: 10 }}
         >
-          1 in / 6 รูป
+          1 in / 6
         </button>
         <button
-          className={`px-4 py-2 m-2 border rounded ${
+          className={`px-4 py-2 m-2 border rounded button ${
             selectedOption === "1_5in6" ? "bg-selected" : ""
           }`}
           onClick={() => setSelectedOption("1_5in6")}
           style={{ zIndex: 10 }}
         >
-          1.5 in / 6 รูป
+          1.5 in / 6
         </button>
         <button
-          className={`px-4 py-2 m-2 border rounded ${
+          className={`px-4 py-2 m-2 border rounded button ${
             selectedOption === "2in6" ? "bg-selected" : ""
           }`}
           onClick={() => setSelectedOption("2in6")}
           style={{ zIndex: 10 }}
         >
-          2 in / 6 รูป
+          2 in / 4
         </button>
       </div>
       <div
@@ -218,6 +240,7 @@ const PhotoOptions = ({ photo }) => {
         {photoGrid ? (
           <div className="relative">
             <img
+              ref={printRef}
               src={photoGrid}
               alt="Generated Grid"
               className="w-full h-auto max-w-full max-h-full"
@@ -230,14 +253,14 @@ const PhotoOptions = ({ photo }) => {
       </div>
       <div className="flex justify-center space-x-4">
         <button
-          className="px-4 py-2 bg-white bg-opacity-75 rounded-lg shadow-lg border border-gray-300"
+          className="px-4 py-2 button bg-white bg-opacity-75 rounded-lg shadow-lg border border-gray-300"
           onClick={downloadImage}
           style={{ zIndex: 10 }}
         >
           ดาวน์โหลด
         </button>
         <button
-          className="px-4 py-2 bg-white bg-opacity-75 rounded-lg shadow-lg border border-gray-300"
+          className="px-4 py-2 button bg-white bg-opacity-75 rounded-lg shadow-lg border border-gray-300"
           onClick={printImage}
           style={{ zIndex: 10 }}
         >
